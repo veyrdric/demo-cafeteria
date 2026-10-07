@@ -1,0 +1,11 @@
+services:
+  cafeteria:
+    build: .
+    ports:
+      - "${PORT:-3001}:3001"
+    volumes:
+      - ./plugins:/app/plugins                              # carpeta vigilada: acá se inyectan los plugins
+      - ./plugins-disponibles:/app/plugins-disponibles:ro
+      - ./scripts:/app/scripts:ro
+      - ./data:/app/data                                    # base SQLite y archivos de los plugins
+    restart: unless-stopped

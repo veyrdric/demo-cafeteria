@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Category {
+  bebida
+  pasteleria
+  sandwich
+}
+
+enum OrderStatus {
+  pendiente
+  preparando
+  listo
+  entregado
+}
+
+model Product {
+  id       Int      @id @default(autoincrement())
+  name     String
+  category Category
+  price    Int
+
+  @@map("products")
+}
+
+model Order {
+  id          Int               @id @default(autoincrement())
+  customer    String
+  tableNo     Int?              @map("table_no")
+  status      OrderStatus       @default(pendiente)
+  subtotal    Int
+  total       Int
+  createdAt   DateTime          @default(now()) @map("created_at")
+  items       OrderItem[]
+  adjustments OrderAdjustment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int      @map("product_id")
+  name      String
+  category  Category
+  qty       Int
+  unitPrice Int      @map("unit_price")
+
+  @@map("order_items")
+}
+
+/// Descuentos o recargos que aplicó un plugin a un pedido.
+model OrderAdjustment {
+  id      Int    @id @default(autoincrement())
+  orderId Int    @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  plugin  String
+  label   String
+  amount  Int
+
+  @@map("order_adjustments")
+}
+
+/// Plugins que el usuario desactivó (el Core recuerda el estado entre reinicios).
+model PluginState {
+  name    String  @id
+  enabled Boolean @default(true)
+
+  @@map("plugin_state")
+}
+
+/// Almacenamiento clave/valor propio de cada plugin.
+model PluginKv {
+  plugin String
+  key    String
+  value  String
+
+  @@id([plugin, key])
+  @@map("plugin_kv")
+}

@@ -1,0 +1,14 @@
+{
+  "name": "demo-cafeteria-microkernel",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Demo de arquitectura Microkernel: gestión de pedidos de una cafetería con plugins en caliente",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n core,front -c yellow,cyan \"npm start --prefix server\" \"npm run dev --prefix client\"",
+    "plugin": "node scripts/plugin.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
